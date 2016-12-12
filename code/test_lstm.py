@@ -13,7 +13,6 @@ from utils import *
 from lstm import LSTM
 from deep_lstm import DLSTM
 
-
 VOCABULARY_SIZE = int(os.environ.get("VOCABULARY_SIZE", "14000"))
 
 
@@ -28,10 +27,11 @@ def generate_sentence_embeddings(model, x_test, word_to_index, index_to_word):
         test_context_vectors.append(generate_sentence_embedding(model, test_sent))
     return test_context_vectors
 
+
 def do_pooling(var_matrix, n_row, n_col, criterion='max'):
-    max_matrix = np.zeros(shape=(n_row,n_col))
-    mean_matrix = np.zeros(shape=(n_row,n_col))
-    min_matrix = np.zeros(shape=(n_row,n_col))
+    max_matrix = np.zeros(shape=(n_row, n_col))
+    mean_matrix = np.zeros(shape=(n_row, n_col))
+    min_matrix = np.zeros(shape=(n_row, n_col))
     (o_row, o_col) = var_matrix.shape
     r_div = o_row / n_row
     c_div = o_col / n_col
@@ -69,12 +69,13 @@ def do_pooling(var_matrix, n_row, n_col, criterion='max'):
         return np.ravel([min_matrix, mean_matrix])
     return np.ravel([max_matrix, mean_matrix, min_matrix])
 
+
 def combine_forward_and_backward_vectors(sentences, sentences_r):
     sentences_combined = []
     pair_length = len(sentences)
     assert pair_length == len(sentences_r)
     for i in range(pair_length):
-        sent_combined =[]
+        sent_combined = []
         forward = sentences[i]
         backward = sentences_r[i]
         sent_len = len(forward)
@@ -85,6 +86,7 @@ def combine_forward_and_backward_vectors(sentences, sentences_r):
             sent_combined.append(np.ravel([forward_word, backward_word]))
         sentences_combined.append(sent_combined)
     return sentences_combined
+
 
 def generate_feature_vector(first_sentences, second_sentences):
     feature_vectors = []
@@ -106,7 +108,8 @@ def generate_feature_vector(first_sentences, second_sentences):
         feature_vectors.append(feature_vector)
     return np.asarray(feature_vectors)
 
-def build_classifier_and_test(train_X, train_y, test_X, test_y, clf, print_train_result = True):
+
+def build_classifier_and_test(train_X, train_y, test_X, test_y, clf, print_train_result=True):
     clf.fit(train_X, train_y)
     if print_train_result == True:
         p_tr = clf.predict(train_X)
@@ -120,6 +123,7 @@ def build_classifier_and_test(train_X, train_y, test_X, test_y, clf, print_train
     print("Recall_score:\t", rc(test_y, predicted))
     print("F-score:\t", f1(test_y, predicted))
 
+
 def test_on_forward_LSTM(model, classifier=MLPClassifier()):
     # '''Generate Sentence embedding with forward model'''
     sent1_train_indices, sent2_train_indices, word_to_index, index_to_word, label_train = get_train_data(
@@ -130,7 +134,7 @@ def test_on_forward_LSTM(model, classifier=MLPClassifier()):
 
     # '''generate feature vector by all pair comparison, then pooling'''
     feature_vector_train = generate_feature_vector(first_train_sentences, second_train_sentences)
-    print("Train data Shape : " , feature_vector_train.shape)
+    print("Train data Shape : ", feature_vector_train.shape)
 
     # '''Generate test data embeddings'''
     sent1_test_indices, sent2_test_indices, word_to_index, index_to_word, label_test = get_test_data(VOCABULARY_SIZE)
@@ -140,12 +144,13 @@ def test_on_forward_LSTM(model, classifier=MLPClassifier()):
 
     # '''Generate feature vector for test; all pair comparison then pooling'''
     feature_vector_test = generate_feature_vector(first_test_sentences, second_test_sentences)
-#    print(feature_vector_test[0])
-    print("Test data Shape : " , feature_vector_test.shape)
+    #    print(feature_vector_test[0])
+    print("Test data Shape : ", feature_vector_test.shape)
 
     # '''Building the Fully connected layer'''
     build_classifier_and_test(
         feature_vector_train, label_train, feature_vector_test, label_test, classifier, print_train_result=False)
+
 
 def test_on_bidirectional_lstm(forward_model, backward_model, classifier=MLPClassifier()):
     # '''Generate Sentence embedding with forward model'''
@@ -173,7 +178,7 @@ def test_on_bidirectional_lstm(forward_model, backward_model, classifier=MLPClas
 
     # '''generate feature vector by all pair comparison, then pooling'''
     feature_vector_train = generate_feature_vector(first_train_sentences_combined, second_train_sentences_combined)
-    print("Train data Shape : " , feature_vector_train.shape)
+    print("Train data Shape : ", feature_vector_train.shape)
 
     # '''Generate test data embeddings'''
     sent1_test_indices, sent2_test_indices, word_to_index, index_to_word, label_test = get_test_data(VOCABULARY_SIZE)
@@ -198,7 +203,7 @@ def test_on_bidirectional_lstm(forward_model, backward_model, classifier=MLPClas
 
     # '''Generate feature vector for test; all pair comparison then pooling'''
     feature_vector_test = generate_feature_vector(first_test_sentences_combined, second_test_sentences_combined)
-    print("Test data Shape : " , feature_vector_test.shape)
+    print("Test data Shape : ", feature_vector_test.shape)
 
     # '''Building the Fully connected layer'''
     build_classifier_and_test(
@@ -208,31 +213,33 @@ def test_on_bidirectional_lstm(forward_model, backward_model, classifier=MLPClas
 
 '''Pooling Criteria'''
 POOLING_CRITERION = 'max'
-print("Multi Layer Perceptron")
+
 """###########################################Test Single Layer LSTM############################################"""
-# print("Single layer LSTM")
-# model = load_model_parameters_theano('./models/forward_single_layer_lstm-2016-12-05-13-04-14000-48-64.dat.npz', LSTM)
-# test_on_forward_LSTM(model, classifier=LogisticRegression())
+print("Single layer LSTM")
+model = load_model_parameters_theano('./models/forward_single_layer_lstm-2016-12-05-13-04-14000-48-64.dat.npz', LSTM)
+test_on_forward_LSTM(model, classifier=LogisticRegression())
 
 """##############################################Test 2-Layer LSTM##############################################"""
-# print("2 layer LSTM")
-# model = load_model_parameters_theano('./models/forward_double_layer_lstm-2016-12-09-19-34-14000-48-64.dat.npz', DLSTM)
-# test_on_forward_LSTM(model, classifier=LogisticRegression())
+print("2 layer LSTM")
+model = load_model_parameters_theano('./models/forward_double_layer_lstm-2016-12-09-19-34-14000-48-64.dat.npz', DLSTM)
+test_on_forward_LSTM(model, classifier=LogisticRegression())
 
 """###########################################Test Single Layer BLSTM###########################################"""
 print("1 layer BLSTM")
-#'''Load Forward Model'''
-forward_model = load_model_parameters_theano('./models/forward_single_layer_lstm-2016-12-05-13-04-14000-48-64.dat.npz', LSTM)
-#'''Load backward model'''
+# '''Load Forward Model'''
+forward_model = load_model_parameters_theano('./models/forward_single_layer_lstm-2016-12-05-13-04-14000-48-64.dat.npz',
+                                             LSTM)
+# '''Load backward model'''
 backward_model = load_model_parameters_theano(
     './models/backward_single_layer_lstm-2016-11-30-21-07-14000-48-64.dat.npz', LSTM)
 test_on_bidirectional_lstm(forward_model, backward_model, classifier=LogisticRegression())
 
 """#############################################Test 2-Layer BLSTM##############################################"""
 print("2 Layer BLSTM")
-#'''Load Forward Model'''
-forward_model = load_model_parameters_theano('./models/forward_double_layer_lstm-2016-12-09-19-34-14000-48-64.dat.npz', DLSTM)
-#'''Load backward model'''
+# '''Load Forward Model'''
+forward_model = load_model_parameters_theano('./models/forward_double_layer_lstm-2016-12-09-19-34-14000-48-64.dat.npz',
+                                             DLSTM)
+# '''Load backward model'''
 backward_model = load_model_parameters_theano(
     './models/backward_double_layer_lstm-2016-12-09-19-49-14000-48-64.dat.npz', DLSTM)
 test_on_bidirectional_lstm(forward_model, backward_model, classifier=LogisticRegression())
