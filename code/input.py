@@ -147,7 +147,6 @@ def get_train_data(vocabulary_size):
 
 def get_train_data_reversed(vocabulary_size):
     sent1_train_indices, sent2_train_indices, word_to_index, index_to_word, label_train = get_train_data(vocabulary_size)
-
     sent1_train_indices_reversed = []
     for index_list in sent1_train_indices:
         temp = []
@@ -166,7 +165,7 @@ def get_train_data_reversed(vocabulary_size):
 
 
 def get_train_sentences(vocabulary_size):
-    sent1_train_indices, sent2_train_indices, word_to_index, index_to_word = get_train_data(vocabulary_size)
+    sent1_train_indices, sent2_train_indices, word_to_index, index_to_word, label_train = get_train_data(vocabulary_size)
     all_sentences = []
     all_sentences.extend(sent1_train_indices)
     all_sentences.extend(sent2_train_indices)
@@ -178,7 +177,7 @@ def get_train_sentences(vocabulary_size):
 
 
 def get_train_sentences_reversed(vocabulary_size):
-    sent1_train_indices_reversed, sent2_train_indices_reversed, word_to_index, index_to_word = get_train_data_reversed(
+    sent1_train_indices_reversed, sent2_train_indices_reversed, word_to_index, index_to_word, label_train = get_train_data_reversed(
         vocabulary_size)
     all_sentences = []
     all_sentences.extend(sent1_train_indices_reversed)
@@ -213,6 +212,7 @@ def get_test_data(vocabulary_size):
     return sent1_test_indices, sent2_test_indices, word_to_index, index_to_word, label_test
 
 
+
 def get_test_data_reversed(vocabulary_size):
     sent1_test_indices, sent2_test_indices, word_to_index, index_to_word, label_test = get_test_data(vocabulary_size)
 
@@ -234,7 +234,7 @@ def get_test_data_reversed(vocabulary_size):
 
 
 def get_test_sentences(vocabulary_size):
-    sent1_test_indices, sent2_test_indices, word_to_index, index_to_word = get_test_data(vocabulary_size)
+    sent1_test_indices, sent2_test_indices, word_to_index, index_to_word, label_test = get_test_data(vocabulary_size)
     all_sentences = []
     all_sentences.extend(sent1_test_indices)
     all_sentences.extend(sent2_test_indices)
@@ -245,7 +245,7 @@ def get_test_sentences(vocabulary_size):
 
 
 def get_test_sentences_reversed(vocabulary_size):
-    sent1_test_indices, sent2_test_indices, word_to_index, index_to_word = get_test_data_reversed(
+    sent1_test_indices, sent2_test_indices, word_to_index, index_to_word, label_test= get_test_data_reversed(
         vocabulary_size)
     all_sentences = []
     all_sentences.extend(sent1_test_indices)
